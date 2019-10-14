@@ -49,7 +49,6 @@ int print_matrix(FILE* fp, matrix_t* m){
 
 // // Multiplica las matrices en m1 y m2
 // matrix_t* matrix_multiply(matrix_t* m1, matrix_t* m2){
-
 // 	if(!m1 || !m2) 
 // 		return NULL;
 // 	if(m1->cols != m2->rows) 

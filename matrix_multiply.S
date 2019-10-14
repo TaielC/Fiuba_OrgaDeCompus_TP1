@@ -52,52 +52,62 @@ matrix_multiply:
 	## a0 <-> m1
 	## a1 <-> m2
 	# inicialización de punteros para iterar
-	sw 	t0, 0(a0)	# t0 = m1->rows
-	sw 	t1, 4(a0)	# t1 = m1->cols (igual a m2->rows)
-	sw 	t2, 4(a1)	# t2 = m2->cols
+	sw 	t0, 0(a0)	# t0 <- m1->rows
+	sw 	t1, 4(a0)	# t1 <- m1->cols (igual a m2->rows)
+	sw 	t2, 4(a1)	# t2 <- m2->cols
 	move 	t3, $0		# t3 = 0 (i = 0)
+
+	# obtenemos posiciones de memoria de los arrays
+	lw t7, 8(a0)	# t7 <- ptr de m1->array
+	lw t8, 8(a1)	# t8 <- ptr de m1->array
+	lw t9, 8(v0)	# t9 <- ptr de m_result->array
 
 for_m1:
 	# recorremos filas de m1
 	beq 	t3, t0, return	# si  (i == m1->rows) return
 	move 	t4, $0		# t4 = 0 (j = 0)
+
 for_m2:
-	# recorremos columnas de m2
-	beq 	t4, t2, for_m1	# si (j == m2->cols) fin_for_m2
+	# recorremos columnas de m2	
+	beq 	t4, t2, fin_for_m2	# si (j == m2->cols) fin_for_m2
 	move 	t5, $0		# t5 = 0 (k = 0)
 	mtc1 	zero, $f0	# $f0 = 0 (suma = 0)
 
+
 for_suma:
 	# suma acumulatoria de m1[i*m1->cols+k] * m2[k*m2->cols+j]
-	beq 	t5, t1, fin_for_m2	# si (k == m1->cols) fin_for_suma
+	beq 	t5, t1, fin_for_suma	# si (k == m1->cols) fin_for_suma
 	multu 	t3, t1		# acc = i * m1->cols
-	mflo 	t6		# t6 = acc
+	mflo 	t6		# t6 = acc 
 	addu 	t6, t6, t5	# t6 = t6 + k
 	sll 	t6, t6, 3	# t6 = 8 * p
-	addu 	t6, t6, a0	# t6 = *m1->array[p]
+	addiu   t6, t6, 8   	# 
+	addu 	t6, t6, t7	# t6 = *m1->array[p]
 	l.d 	$f2, 0(t6)	# $f2 <- p
-	multu 	t5, t3		# acc = k * m2->cols
+	multu 	t5, t2		# acc = k * m2->cols
 	mflo 	t6		# t6 = acc
-	addu 	t6, t6, t3	# t6 = t6 + i
+	addu 	t6, t6, t4	# t6 = t6 + j
 	sll 	t6, t6, 3	# t6 = 8 * p
-	addu 	t6, t6, a1	# t6 = *m2->array[p]
+	addiu   t6, t6, 8 	#
+	addu 	t6, t6, t8	# t6 = *m2->array[p]
 	l.d 	$f4, 0(t6)	# $f4 <- p
 	mul.d 	$f2, $f2, $f4 	# $f2 = $f2 * $f4
 	add.d 	$f0, $f0, $f2 	# suma += $f2
-	addiu 	t5, $0, 1	# k++
+	addiu 	t5, t5, 1	# k++
 
 fin_for_suma:
 	multu 	t3, t0		# t6 = i * m1->rows
 	mflo 	t6		# t6 = acc
 	addu 	t6, t6, t4	# t6 = t6 + j
 	sll	t6, t6, 3	# t6 = 8 * p
-	addu 	t6, t6, v0	# t6 = *m_result[p]
+	addiu   t6, t6, 8 
+	addu 	t6, t6, t9	# t6 = *m_result[p]
 	s.d 	$f0, 0(t6)	# t6 <- $f0
-	addiu 	t4, $0, 1	# j++	
+	addiu 	t4, t4, 1	# j++
 	bal 	for_m2
 
 fin_for_m2:
-	addiu 	t3, $0, 1	# i++
+	addiu 	t3, t3, 1	# i++
 	bal 	for_m1
 
 return:
@@ -111,5 +121,3 @@ return:
 	jr	ra
 	.end	matrix_multiply
 	.size matrix_multiply,.-matrix_multiply
-
-
