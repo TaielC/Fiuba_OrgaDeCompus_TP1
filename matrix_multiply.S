@@ -52,9 +52,9 @@ matrix_multiply:
 	## a0 <-> m1
 	## a1 <-> m2
 	# inicialización de punteros para iterar
-	sw 	t0, 0(a0)	# t0 <- m1->rows
-	sw 	t1, 4(a0)	# t1 <- m1->cols (igual a m2->rows)
-	sw 	t2, 4(a1)	# t2 <- m2->cols
+	lw 	t0, 0(a0)	# t0 <- m1->rows
+	lw 	t1, 4(a0)	# t1 <- m1->cols (igual a m2->rows)
+	lw 	t2, 4(a1)	# t2 <- m2->cols
 	move 	t3, $0		# t3 = 0 (i = 0)
 
 	# obtenemos posiciones de memoria de los arrays
@@ -72,7 +72,7 @@ for_m2:
 	beq 	t4, t2, fin_for_m2	# si (j == m2->cols) fin_for_m2
 	move 	t5, $0		# t5 = 0 (k = 0)
 	mtc1 	zero, $f0	# $f0 = 0 (suma = 0)
-
+	mtc1 	zero, $f1	
 
 for_suma:
 	# suma acumulatoria de m1[i*m1->cols+k] * m2[k*m2->cols+j]
@@ -81,14 +81,12 @@ for_suma:
 	mflo 	t6		# t6 = acc 
 	addu 	t6, t6, t5	# t6 = t6 + k
 	sll 	t6, t6, 3	# t6 = 8 * p
-	addiu   t6, t6, 8   	# 
 	addu 	t6, t6, t7	# t6 = *m1->array[p]
 	l.d 	$f2, 0(t6)	# $f2 <- p
 	multu 	t5, t2		# acc = k * m2->cols
 	mflo 	t6		# t6 = acc
 	addu 	t6, t6, t4	# t6 = t6 + j
 	sll 	t6, t6, 3	# t6 = 8 * p
-	addiu   t6, t6, 8 	#
 	addu 	t6, t6, t8	# t6 = *m2->array[p]
 	l.d 	$f4, 0(t6)	# $f4 <- p
 	mul.d 	$f2, $f2, $f4 	# $f2 = $f2 * $f4
@@ -100,9 +98,8 @@ fin_for_suma:
 	mflo 	t6		# t6 = acc
 	addu 	t6, t6, t4	# t6 = t6 + j
 	sll	t6, t6, 3	# t6 = 8 * p
-	addiu   t6, t6, 8 
 	addu 	t6, t6, t9	# t6 = *m_result[p]
-	s.d 	$f0, 0(t6)	# t6 <- $f0
+	s.d 	$f0, 0(t6)	# m_result[p] <- $f0
 	addiu 	t4, t4, 1	# j++
 	bal 	for_m2
 
