@@ -92,6 +92,7 @@ for_suma:
 	mul.d 	$f2, $f2, $f4 	# $f2 = $f2 * $f4
 	add.d 	$f0, $f0, $f2 	# suma += $f2
 	addiu 	t5, t5, 1	# k++
+	bal for_suma
 
 fin_for_suma:
 	multu 	t3, t0		# t6 = i * m1->rows
