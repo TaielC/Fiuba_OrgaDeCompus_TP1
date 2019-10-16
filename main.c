@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "matrix.h"
+#include "mymalloc.h"
 
 int main(int argc, char const *argv[]){
 
@@ -91,7 +92,8 @@ int main(int argc, char const *argv[]){
 
 		destroy_matrix(matrix1);
 		destroy_matrix(matrix2);
-		destroy_matrix(matrix_result);
+		// Destruimos la matriz de resultado con la función que fue creada
+		free(matrix_result); 	
 	}
 
 	return EXIT_SUCCESS;

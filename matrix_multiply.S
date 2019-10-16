@@ -39,11 +39,14 @@ matrix_multiply:
 	bne 	t0, t1, return	# si (m1->cols != m2->rows) return
 
 	# Creamos la matriz a devolver 
-	lw 	a0, 0(a0)	# a0 <- m1->rows
-	lw 	a1, 4(a1)	# a1 <- m2->cols
-	la 	t9, create_matrix
-	jal 	ra, t9
-	beq	v0, $0, return	# verificamos que la matriz no es NULL
+	lw 	t0, 0(a0)	# t0 <- m1->rows
+	lw 	t1, 4(a1)	# t1 <- m2->cols
+	multu	t0, t1		# acc = t0 * t1 (tamanio de m_return)
+	mflo	a0		# a0 = acc
+	addiu	a0, a0, 12	# a0 = a0 + 12 (struct matrix_t + tamanio)
+	la 	t9, malloc	# cargamos mymalloc
+	jal 	ra, t9		# llamamos a mymalloc
+	beq	v0, $0, return	# verificamos que el valor de retorno sea válido
 
 	lw 	a0, 32($fp)
 	lw 	a1, 36($fp)
@@ -51,10 +54,17 @@ matrix_multiply:
 	## v0 <-> m_return
 	## a0 <-> m1
 	## a1 <-> m2
-	# inicialización de punteros para iterar
 	lw 	t0, 0(a0)	# t0 <- m1->rows
 	lw 	t1, 4(a0)	# t1 <- m1->cols (igual a m2->rows)
 	lw 	t2, 4(a1)	# t2 <- m2->cols
+
+	# llenamos los datos de m_result
+	addiu 	t3, v0, 12	# t3 será la posición de *array de m_result
+	sw	t3, 8(v0)	# m_result->array <- t3
+	sw	t0, 0(v0)	# m_result->rows <- t0
+	sw	t2, 4(v0)	# m_result->cols <- t2
+
+	# inicialización para iterar
 	move 	t3, $0		# t3 = 0 (i = 0)
 
 	# obtenemos posiciones de memoria de los arrays
@@ -92,7 +102,7 @@ for_suma:
 	mul.d 	$f2, $f2, $f4 	# $f2 = $f2 * $f4
 	add.d 	$f0, $f0, $f2 	# suma += $f2
 	addiu 	t5, t5, 1	# k++
-	bal for_suma
+	bal 	for_suma
 
 fin_for_suma:
 	multu 	t3, t0		# t6 = i * m1->rows

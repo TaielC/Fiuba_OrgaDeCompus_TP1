@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "matrix.h"
-
+#include "mymalloc.h"
 
 int main(int argc, char const *argv[]){
 
@@ -26,7 +26,6 @@ int main(int argc, char const *argv[]){
 	}
 	
 	size_t i = 0;
-	long int dim_leida;
 	size_t dim;
 	matrix_t* matrix1;
 	matrix_t* matrix2;
@@ -35,16 +34,14 @@ int main(int argc, char const *argv[]){
 
 	while(!feof(stdin)){
 		dim = 0;
-		fscanf(stdin, " %li", &dim_leida);
+		fscanf(stdin, " %zu", &dim);
 
 		if(feof(stdin)) 
 			exit(EXIT_SUCCESS);
-		else if(dim_leida <= 0 && !feof(stdin)){
+		else if(dim <= 0 && !feof(stdin)){
 			fprintf(stderr, "La dimension leida no es valida.\n");
 			exit(EXIT_FAILURE);
 		}
-		
-		dim = (size_t)dim_leida;
 
 		// Creación de matrices 1 y 2 a multiplicar
 		matrix1 = create_matrix(dim, dim);
@@ -95,7 +92,8 @@ int main(int argc, char const *argv[]){
 
 		destroy_matrix(matrix1);
 		destroy_matrix(matrix2);
-		destroy_matrix(matrix_result);
+		// Destruimos la matriz de resultado con la función que fue creada
+		free(matrix_result); 	
 	}
 
 	return EXIT_SUCCESS;
