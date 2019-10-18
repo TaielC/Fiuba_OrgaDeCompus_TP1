@@ -43,6 +43,7 @@ matrix_multiply:
 	lw 	t1, 4(a1)	# t1 <- m2->cols
 	multu	t0, t1		# acc = t0 * t1 (tamanio de m_return)
 	mflo	a0		# a0 = acc
+	sll	a0, a0, 3	# 
 	addiu	a0, a0, 12	# a0 = a0 + 12 (struct matrix_t + tamanio)
 	la 	t9, malloc	# cargamos mymalloc
 	jal 	ra, t9		# llamamos a mymalloc
