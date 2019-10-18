@@ -45,7 +45,7 @@ matrix_multiply:
 	mflo	a0		# a0 = acc
 	sll	a0, a0, 3	# 
 	addiu	a0, a0, 12	# a0 = a0 + 12 (struct matrix_t + tamanio)
-	la 	t9, malloc	# cargamos mymalloc
+	la 	t9, mymalloc	# cargamos mymalloc
 	jal 	ra, t9		# llamamos a mymalloc
 	beq	v0, $0, return	# verificamos que el valor de retorno sea válido
 
