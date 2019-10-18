@@ -93,7 +93,7 @@ int main(int argc, char const *argv[]){
 		destroy_matrix(matrix1);
 		destroy_matrix(matrix2);
 		// Destruimos la matriz de resultado con la función que fue creada
-		free(matrix_result); 	
+		myfree(matrix_result); 	
 	}
 
 	return EXIT_SUCCESS;
